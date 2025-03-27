@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block mymessage %}
+<div class="container text-center mt-5">
+  <h1 class="display-4">Image Resizer</h1>
+  <p class="lead">Easily resize images online for free.</p>
+  <div class="card shadow-lg mt-4 mx-auto" style="max-width: 500px; border-radius: 15px;">
+    <div class="card-body p-4">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload Image</label>
+          <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100" style="border-radius: 10px;">
+          <i class="bi bi-upload"></i> Upload & Resize Image
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

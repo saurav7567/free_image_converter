@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block mymessage %}
+
+<div class="container mt-5" id="inputs">
+  <div class="card shadow-lg border-0" style="max-width: 500px; margin: 0 auto;">
+    <div class="card-body">
+      <h1 class="text-center text-primary mb-4">Merge PDF Files</h1>
+      <p class="text-center text-muted">Combine PDFs in the order you want with the easiest PDF merger available.</p>
+      <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+        <div class="text-center">
+          <label class="btn btn-primary" for="formFile" style="cursor: pointer;">
+            Choose PDF Files
+          </label>
+          <input 
+            type="file" id="formFile" name="pdf_files" class="form-control" style="display: none;" multiple onchange="updateFileList()">
+        </div>
+        <div class="mt-4 text-center">
+          <button type="submit" class="btn btn-success">Upload Files</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-5" id="show" style="display: none;">
+  <div class="card shadow-lg border-0" style="max-width: 350px; margin: 0 auto;">
+    <div class="card-body">
+      <h3 class="text-center text-success mb-4">Selected Files</h3>
+      <ul class="list-group" id="fileList">
+        <!-- Dynamically added file names will appear here -->
+      </ul>
+      <div class="mt-4 text-center">
+        <button class="btn btn-primary" id="mergeButton" style="display: none;">Merge PDFs</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Function to dynamically update the file list
+  function updateFileList() {
+    const fileInput = document.getElementById("formFile");
+    const fileListContainer = document.getElementById("fileList");
+    const showContainer = document.getElementById("show");
+    const mergeButton = document.getElementById("mergeButton");
+
+    // Clear the current list
+    fileListContainer.innerHTML = "";
+
+    // Check if any files were selected
+    if (fileInput.files.length > 0) {
+      showContainer.style.display = "block"; // Show the file list section
+      mergeButton.style.display = "inline-block"; // Show the merge button
+
+      // Add each selected file to the list
+      Array.from(fileInput.files).forEach((file) => {
+        const listItem = document.createElement("li");
+        listItem.className = "list-group-item";
+        listItem.textContent = file.name;
+        fileListContainer.appendChild(listItem);
+      });
+    } else {
+      showContainer.style.display = "none"; // Hide the file list section if no files
+      mergeButton.style.display = "none"; // Hide the merge button
+    }
+  }
+</script>
+
+{% endblock %}

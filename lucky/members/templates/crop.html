@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Crop Image</title>
+    <style>
+      body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+      }
+      .navbar {
+        z-index: 1;
+      }
+      .main-container {
+        display: flex;
+        height: calc(100vh - 70px); /* Exclude navbar height */
+      }
+      .sidebar {
+        width: 30%;
+        background-color: #1f1f1f;
+        padding: 20px;
+        overflow-y: auto;
+        border-right: 2px solid #6c757d;
+      }
+      .content-area {
+        width: 70%;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .content-area img {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 10px;
+      }
+      label {
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">
+          <i class="bi bi-aspect-ratio"></i> Crop Image
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <h4 class="text-center mb-4">Crop Image</h4>
+        <form id="cropForm" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="imageInput" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="imageInput" name="image" required accept="image/*">
+          </div>
+          <div class="mb-3">
+            <label for="cropCoords" class="form-label">Crop Coordinates (x1,y1,x2,y2)</label>
+            <input type="text" class="form-control" id="cropCoords" name="crop_coords" placeholder="e.g., 0,0,100,100" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Crop Image</button>
+        </form>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <img id="previewImage" src="https://via.placeholder.com/800x600" alt="Placeholder Image">
+      </div>
+    </div>
+
+    <script>
+      // Handle dynamic image preview
+      document.getElementById('imageInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const previewImage = document.getElementById('previewImage');
+            previewImage.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Handle form submission dynamically
+      document.getElementById('cropForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+
+        // Send a POST request to the crop endpoint
+        fetch('/crop/', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.saved_path) {
+              // Update the preview with the cropped image
+              const previewImage = document.getElementById('previewImage');
+              previewImage.src = '/' + data.saved_path; // Adjust path based on your setup
+            } else if (data.error) {
+              alert('Error: ' + data.error);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
